@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as api from '../utils/api';
 import DefaultView from './DefaultView';
-import CategoryView from './CategoryView';
 import PostDetailView from './PostDetailView';
 import AddEditPostView from './AddEditPostView';
 import { Route } from 'react-router-dom';
