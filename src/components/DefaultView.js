@@ -44,9 +44,9 @@ class DefaultView extends Component {
         }
     }
 
-    /*  1) Find the Sort By select in dom read its default value
-     *  2) Sort the posts based on this default value
-     *  3) Store these sorted posts in the local state */
+    // 1. Find the Sort By select in dom read its default value
+    // 2. Sort the posts based on this default value
+    // 3. Store these sorted posts in the local state */
     initialize(posts) {
         let select = document.getElementById('sortSelect');
         let selectedOption = select.options[select.selectedIndex].value;
@@ -124,7 +124,7 @@ class DefaultView extends Component {
                         <li><Link to={'/'}>Show All</Link></li>
                         {this.props.categories.map(category => (
                             <li key={category.name}>
-                                <Link to={`/category/${category.name}`}>{category.name}</Link>
+                                <Link to={`/${category.name}`}>{category.name}</Link>
                             </li>
                         ))}
                     </ul>

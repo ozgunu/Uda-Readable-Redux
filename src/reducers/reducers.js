@@ -24,7 +24,7 @@ function myPostStore (state = { posts:[] }, action) {
             };
         
         case ADD_POST:
-            postsFromState = state.posts;
+            postsFromState = state.posts.slice(0);
             postsFromState.push(post);
             return {
                 ...state,
@@ -32,6 +32,7 @@ function myPostStore (state = { posts:[] }, action) {
             };
 
         case REMOVE_POST:
+            postsFromState = state.posts.slice(0);
             postsFromState = state.posts.filter(currentPost => currentPost.id !== post.id);
             return {
                 ...state,
@@ -39,7 +40,8 @@ function myPostStore (state = { posts:[] }, action) {
             };
         
         case UPDATE_POST:
-            postsFromState = state.posts.map(currentPost => {
+            postsFromState = state.posts.slice(0);
+            postsFromState = postsFromState.map(currentPost => {
                 if (currentPost.id === post.id)
                     currentPost = post;
                 return currentPost;
@@ -56,7 +58,6 @@ function myPostStore (state = { posts:[] }, action) {
 
 }
 
-// Reducer for controlling the 'Comments Store'
 function myCommentStore (state = {}, action) {
 
     const { comments, comment, postId} = action;
@@ -71,33 +72,36 @@ function myCommentStore (state = {}, action) {
 
     // Add single comment
     if (action.type === ADD_COMMENT) {
-        let comments = state[postId] ? state[postId] : [];
-        comments.push(comment);
+        // Used slice here to duplicate the array !!!
+        let stateComments = state[postId] ? state[postId].slice(0) : [];
+        stateComments.push(comment);
         return { 
             ...state,
-            [postId]: comments
+            [postId]: stateComments
         };
     }
 
     // Remove a comment
     if (action.type === REMOVE_COMMENT) {
-        let comments = state[postId].filter(com => com.id !== comment.id);
+        let stateComments = state[postId] ? state[postId].slice(0) : [];
+        stateComments = stateComments.filter(com => com.id !== comment.id);
         return { 
             ...state,
-            [postId]: comments
+            [postId]: stateComments
         };
     }
 
     // Update a comment
     if (action.type === UPDATE_COMMENT) {
-        let comments = state[comment.parentId].map(currentComment => {
+        let stateComments = state[comment.parentId] ? state[comment.parentId].slice(0) : []
+        stateComments = stateComments.map(currentComment => {
             if (currentComment.id === comment.id)
                 currentComment = comment;
             return currentComment;
         })   
         return { 
             ...state,
-            [comment.parentId]: comments
+            [comment.parentId]: stateComments
         };
     }
 

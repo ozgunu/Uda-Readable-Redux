@@ -46,7 +46,7 @@ class SingleCommentView extends Component {
 
     render() {
 
-        // Get the comment from the state
+        // Get the comment from props
         const { comment } = this.props;
 
         return (

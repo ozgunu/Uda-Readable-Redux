@@ -58,15 +58,15 @@ class AddEditPostView extends Component {
         // Update an existing post
         if (this.state.post.id) {
             api.updatePost(this.state.post.id, this.state.post).then(post => {
-                this.props.updatePost(post);                    // Update post in the Redux store
-                this.props.history.push(`/post/${post.id}`);    // Display the newly edited post
+                this.props.updatePost(post);                                // Update post in the Redux store
+                this.props.history.push(`/${post.category}/${post.id}`);    // Display the newly edited post
             })
 
         // Create a new post
         } else {
             api.addPost(this.state.post.id, this.state.post).then(post => {
-                this.props.addPost(post);                       // Add the post to the Redux store
-                this.props.history.push(`/post/${post.id}`);    // Display the newly created post
+                this.props.addPost(post);                                   // Add the post to the Redux store
+                this.props.history.push(`/${post.category}/${post.id}`);    // Display the newly created post
             })
         }
 

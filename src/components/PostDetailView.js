@@ -70,8 +70,8 @@ class PostDetailView extends Component {
         api.addComment(comment).then(newComment => {
             this.toggleCommentInput();                  // Hide comment input box
             let post = this.props.post;                 // Get post
+            post.commentCount = post.commentCount + 1;
             this.props.addComment(post.id, newComment); // Add comment to Redux Store
-            this.props.updatePost(post.commentCount++); // Update post in Redux Store
         });
     };
 
@@ -79,8 +79,8 @@ class PostDetailView extends Component {
     deleteComment = (commentId) => {
         api.deleteComment(commentId).then(deletedComment => {
             let post = this.props.post;                          // Get post
+            post.commentCount = post.commentCount - 1;
             this.props.removeComment(post.id, deletedComment);   // Remove comment from Redux Store
-            this.props.updatePost(post.commentCount--);          // Update post in Redux Store
         });
     };
 
@@ -147,8 +147,7 @@ function mapStateToProps ({myPostStore, myCommentStore}, selfProps) {
     // Find the post in Redux Store using its ID
     let post = myPostStore.posts.find(post => post.id === postId);
     
-    // If we find comments for this postId 
-    // in Redux Store, send them in props
+    // If we find comments for this postId in Redux Store, send them in props
     if (myCommentStore[postId]) {
         return {
             post,
@@ -181,5 +180,3 @@ export default withRouter(connect(
     mapStateToProps,
     mapDispatchToProps
 )(PostDetailView));
-
-//export default PostDetailView;

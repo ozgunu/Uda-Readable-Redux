@@ -14,7 +14,7 @@ const SinglePostView = (props) => {
                 <div className='float-right' style={{'marginRight': '10px'}}><a onClick={() => {changeVote && changeVote('upVote', post.id)}}>Vote Up</a></div>
                 {
                     (isSummary)
-                    ? <Link to={`/post/${post.id}`}><div className='post-title'>{post.title}</div></Link> 
+                    ? <Link to={`/${post.category}/${post.id}`}><div className='post-title'>{post.title}</div></Link> 
                     : <div className='post-title'>{post.title}</div>                    
                 }
                 <div className='post-info-bar'>
