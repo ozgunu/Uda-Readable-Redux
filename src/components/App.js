@@ -4,13 +4,23 @@ import DefaultView from './DefaultView';
 import PostDetailView from './PostDetailView';
 import AddEditPostView from './AddEditPostView';
 import { Route } from 'react-router-dom';
-import createHistory from 'history/createBrowserHistory';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import { addPost, addPosts, removePost, updatePost, addCategories } from '../actions/actions';
 
 class App extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {}
+  // Fetch data from server
+  componentDidMount() {
+
+    api.fetchCategories().then(categories => {
+        this.props.addCategories(categories);
+    });
+
+    api.fetchPosts().then(posts => {
+        this.props.addPosts(posts);
+    });
+
   }
 
   render() {
@@ -34,17 +44,34 @@ class App extends Component {
 
           { /* Post Add */ }
           <Route exact path="/addEditPost" render={({history, match}) => (
-            <AddEditPostView history={history} params={match.params}/>
+            <AddEditPostView history={history} params={match.params} />
           )}/>
 
           { /* Post Edit */ }
           <Route path="/addEditPost/:postId" render={({history, match}) => (
             <AddEditPostView history={history} params={match.params}/>
           )}/>
-
+          
       </div>
     );
   }
 }
 
-export default App;
+function mapStateToProps ({ posts, categories }) {
+  return { posts, categories };
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    addPosts: (data) => dispatch(addPosts(data)),
+    addPost: (data) => dispatch(addPost(data)),
+    removePost: (data) => dispatch(removePost(data)),
+    updatePost: (data) => dispatch(updatePost(data)),
+    addCategories: (data) => dispatch(addCategories(data))
+  };
+}
+
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App));

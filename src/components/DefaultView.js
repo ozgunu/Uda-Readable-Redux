@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import * as api from '../utils/api';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import SinglePostView from './SinglePostView';
+import { connect } from 'react-redux';
+import { updatePost, addCategories, addPosts } from '../actions/actions'
 
 class DefaultView extends Component {
 
@@ -9,29 +11,38 @@ class DefaultView extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            categories: [],
             posts: []
         }
     }
 
-    // Fetch data from server
     componentDidMount() {
-        api.fetchCategories().then(categories => {
-            this.setState({categories});
-        });
-        api.fetchPosts().then(posts => {
-            // See what is selected by default, then sort and setState
-            let select = document.getElementById('sortSelect');
-            let selectedOption = select.options[select.selectedIndex].value;
-            this.setState({posts: this.sortPosts(posts, selectedOption)});
-        });
+        if (this.props.posts && this.props.posts.length > 0) {
+            this.initialize(this.props.posts);
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.posts && nextProps.posts.length > 0) {
+            this.initialize(nextProps.posts);
+        }
+    }
+
+    /*  1) Find the Sort By select in dom read its default value
+     *  2) Sort the posts based on this default value
+     *  3) Store these sorted posts in the local state
+     */
+    initialize(posts) {
+        let select = document.getElementById('sortSelect');
+        let selectedOption = select.options[select.selectedIndex].value;
+        let sortedPosts = this.sortPosts(posts, selectedOption);
+        this.setState({ posts: sortedPosts });
     }
 
     // Sort posts by timeStamp or voteScore
     sortPosts (posts, operation) {
-        if (operation === 'timeStamp') {
+        if (operation.toLowerCase() === 'timestamp') {
             return posts.sort((postA, postB) => postB.timestamp - postA.timestamp);
-        } else if (operation === 'voteScore') {
+        } else if (operation.toLowerCase() === 'votescore') {
             return posts.sort((postA, postB) => postB.voteScore - postA.voteScore);
         }
     }
@@ -48,29 +59,18 @@ class DefaultView extends Component {
     changeVote = (action, id) => {
         if (action === 'upVote' || action === 'downVote') {
             api.votePost(id, action).then(updatedPost => {
-                this.setState(prevState => {
-                    let posts = prevState.posts.map(post => {
-                        if (post.id === id) {
-                            post = updatedPost;
-                        }
-                        return post;
-                    });
-                    return { posts };
-                });
+               this.props.updatePost(updatedPost);
             });
         }
     }
-
-    // Render
+    
     render() {
 
-        let filteredPosts = [];
+        // Read the desired category from the url params and filter (or not) posts based on that
+        let filteredPosts = this.state.posts;
         let categoryFromParams = (this.props.params) ? this.props.params.category : '';
-
         if (categoryFromParams) {
             filteredPosts = this.state.posts.filter(post => post.category === categoryFromParams);
-        } else {
-            filteredPosts = this.state.posts;
         }
 
         return ( 
@@ -84,8 +84,8 @@ class DefaultView extends Component {
                     )}
                     <div>
                         <div className='float-left'>Sort by
-                            <select className='select' defaultValue='timeStamp' id='sortSelect' onChange={this.handleSortChange}>
-                                <option value='timeStamp'>Time</option>
+                            <select className='select' defaultValue='timestamp' id='sortSelect' onChange={this.handleSortChange}>
+                                <option value='timestamp'>Time</option>
                                 <option value='voteScore'>Vote Score</option>
                             </select>
                         </div>
@@ -106,7 +106,7 @@ class DefaultView extends Component {
                     <h4>Categories</h4>
                     <ul>
                         <li><Link to={'/'}>Show All</Link></li>
-                        {this.state.categories.map(category => (
+                        {this.props.categories.map(category => (
                             <li key={category.name}>
                                 <Link to={`/category/${category.name}`}>{category.name}</Link>
                             </li>
@@ -120,4 +120,24 @@ class DefaultView extends Component {
 
 }
 
-export default DefaultView;
+function mapStateToProps ({myPostStore, myCategoryStore}) {
+    return { 
+        posts: myPostStore.posts, 
+        categories: myCategoryStore.categories
+    };
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        updatePost: (data) => dispatch(updatePost(data)),
+        addPosts: (data) => dispatch(addPosts(data)),
+        addCategories: (data) => dispatch(addCategories(data))
+    };
+}
+
+export default withRouter(connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(DefaultView));
+
+//export default DefaultView;

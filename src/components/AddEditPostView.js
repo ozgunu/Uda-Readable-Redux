@@ -1,61 +1,72 @@
 import React, { Component } from 'react';
 import * as api from '../utils/api';
-import { Link } from 'react-router-dom';
-import serializeForm from 'form-serialize'; 
+import { addPost, updatePost } from '../actions/actions';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+// We only store the current post in the local state of this component.
+// All other categories and posts are accessed from Redux Store via props.
+// When we create / update a post, we update server first, then update
+// the post within the Redux Store.
 
 class AddEditPostView extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            post: {},
-            categories: []
+            post: {}
         }
     }
 
     componentDidMount() {
+
+        // Look at the url params, do we have a postId passed?
         let postId = (this.props.params) ? this.props.params.postId : null;
+
+        // We are editing an existing post, find it in Redux Store, save it to local state
         if (postId) {
-            // We are editing an existing post, fetch it, then fetch categories
-            api.fetchPost(postId).then(fetchedPost => {
-                api.fetchCategories().then(categories => {
-                    this.setState({post: fetchedPost, categories});
-                });
+            var post = this.props.posts.find(post => post.id === postId);
+            this.setState({
+                post: post ? post : {}
             });
+        
+        // We are adding a new post, just set its default category
         } else {
-            // We are adding a new post, just fetch categories
-            api.fetchCategories().then(categories => {
-                this.setState({ 
-                    categories,
-                    post: { category: 'react' },
-                });
+            this.setState({
+                post: { category: 'react' },
             });
         }
+
     }
 
+    // Form is submitted, update the server, then update the Redux Store
     handleSubmit = (event) => {
-        // Prevent default form submit event which will force re-render
+
+        // Prevent default form submit event as it will force re-render
         event.preventDefault();
 
         // Update an existing post
         if (this.state.post.id) {
             api.updatePost(this.state.post.id, this.state.post).then(post => {
-                this.props.history.push(`/post/${post.id}`);
+                this.props.updatePost(post);                    // Update post in the Redux store
+                this.props.history.push(`/post/${post.id}`);    // Display the newly edited post
             })
 
         // Create a new post
         } else {
             api.addPost(this.state.post.id, this.state.post).then(post => {
-                this.props.history.push(`/post/${post.id}`);
+                this.props.addPost(post);                       // Add the post to the Redux store
+                this.props.history.push(`/post/${post.id}`);    // Display the newly created post
             })
         }
+
     }
 
+    // Update local state on each keypress for input fields
     handleKeyPress = (event) => {
         const propertyName = event.target.name;
         const value = event.target.value ? event.target.value : '';
         this.setState((prevState) => ({
-            ...prevState,
             post: {
                 ...prevState.post,
                 [propertyName]: value
@@ -63,10 +74,10 @@ class AddEditPostView extends Component {
         }));
     }
 
+    // Update local state when category is changed using dropdown
     handleCategoryChange = (event) => {
         const category = event.target.value;
         this.setState((prevStsate) => ({
-           ...prevStsate,
            post: {
                ...prevStsate.post,
                category
@@ -76,7 +87,8 @@ class AddEditPostView extends Component {
 
     render() {
         
-        const { post, categories } = this.state;
+        const { post } = this.state;
+        const { categories } = this.props;
 
         // If editing existing post, disable some fields
         const status = post.id ? 'disabled' : 'enabled';
@@ -117,4 +129,21 @@ class AddEditPostView extends Component {
 
 }
 
-export default AddEditPostView;
+function mapStateToProps ({myPostStore, myCategoryStore}) {
+    return {
+        posts: myPostStore.posts,
+        categories: myCategoryStore.categories
+    };
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        addPost: (data) => dispatch(addPost(data)),
+        updatePost: (data) => dispatch(updatePost(data))
+    };
+}
+  
+export default withRouter(connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(AddEditPostView));

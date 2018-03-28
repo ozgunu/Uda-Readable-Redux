@@ -1,26 +1,25 @@
 import React, { Component } from 'react';
 import * as api from '../utils/api';
+import { withRouter } from 'react-router-dom';
 import AddEditCommentView from './AddEditCommentView';
-import { updateComment } from '../utils/api';
+import { updateComment } from '../actions/actions';
+import { connect } from 'react-redux';
+
+/*  This component does not maintain its own state. It receives the
+/*  comment object in its props from the previous component - the conventional
+/*  way, and uses that to populate the comment.
+/*
+/*  When an update has been made by user to the comment, this component
+/*  updates the comment in the server first, and then updates the comment
+/*  in the Redux Store. */
 
 class SingleCommentView extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            comment : {}
-        }
-    }
-
-    componentDidMount() {
-        this.setState({comment: this.props.comment});
-    }
 
     // Increase or decrease the voteScore for the comment
     changeVote = (action, id) => {
         if (action === 'upVote' || action === 'downVote') {
-            api.voteComment(id, action).then(comment => {
-                this.setState({comment});
+            api.voteComment(id, action).then(updatedComment => {
+                this.props.updateComment(updatedComment);
             });
         }
     }
@@ -38,14 +37,14 @@ class SingleCommentView extends Component {
     editComment = (comment) => {
         api.updateComment(comment).then(updatedComment => {
             this.toggleCommentInput(comment.id);
-            this.setState({comment: updatedComment});
+            this.props.updateComment(updatedComment);
         })
     }
 
     render() {
 
         // Get the comment from the state
-        const { comment } = this.state;
+        const { comment } = this.props;
 
         return (
             <div>
@@ -77,4 +76,15 @@ class SingleCommentView extends Component {
 
 }
 
-export default SingleCommentView;
+function mapDispatchToProps(dispatch) {
+    return {
+        updateComment: (comment) => dispatch(updateComment(comment))
+    };
+}
+
+export default withRouter(connect(
+    null,
+    mapDispatchToProps
+)(SingleCommentView));
+
+//export default SingleCommentView;

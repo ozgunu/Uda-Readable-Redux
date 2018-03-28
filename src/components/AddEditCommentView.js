@@ -1,6 +1,14 @@
 
 import React, { Component } from 'react';
-import * as api from '../utils/api';
+
+/* This component maintains its own state for managint its input fields.
+/* It receives a comment object in its props, passed to it by its parent component.
+/* Stores this in the local state, populates input fields from this if necessary etc.
+
+/* When a comment is submitted by the submit button, the function passed by the parent
+/* component is called, and the local state is passed to that function (as a comment object).
+/* Depending on which parent created this component, this function either creates a new
+/* comment or edits the existing one in the server. */
 
 class AddEditCommentView extends Component {
 
@@ -15,8 +23,16 @@ class AddEditCommentView extends Component {
         };
     }
 
-    componentWillReceiveProps(props) {
-        
+    componentDidMount() {
+        this.initialize(this.props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.initialize(nextProps);
+    }
+    
+    initialize(props) {
+
         // We will be adding a new comment
         if (props.parentId) {
             this.setState({parentId: props.parentId});
@@ -44,8 +60,11 @@ class AddEditCommentView extends Component {
     submitComment = (event) => {
         event.preventDefault();
         if (this.props.submitComment) {
-            let state = this.state;
             this.props.submitComment(this.state);
+            this.setState({
+                author: '',
+                body: ''
+            })
         }
     }
 

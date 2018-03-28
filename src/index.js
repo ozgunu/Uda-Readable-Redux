@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/App';
 import { createStore, applyMiddleware, compose } from 'redux';
+import { Provider } from 'react-redux'
 import registerServiceWorker from './registerServiceWorker';
-import { BrowserRouter, Link, Route } from 'react-router-dom';
-import reducer from './reducers';
+import { BrowserRouter } from 'react-router-dom';
+import reducer from './reducers/reducers';
 
 // Logger
 const logger = store => next => action => {
@@ -29,9 +30,12 @@ const store = createStore(
 );
 
 ReactDOM.render(
-    <BrowserRouter store={store}>
-        <App history={this.history}/>
-    </BrowserRouter>, 
-    document.getElementById('root'));
+    <Provider store={store}>
+        <BrowserRouter>
+            <App history={this.history}/>
+        </BrowserRouter>
+    </Provider>,
+    document.getElementById('root')
+);
 
 registerServiceWorker();
