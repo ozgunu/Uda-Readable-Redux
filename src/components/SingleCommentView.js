@@ -5,13 +5,16 @@ import AddEditCommentView from './AddEditCommentView';
 import { updateComment } from '../actions/actions';
 import { connect } from 'react-redux';
 
-/*  This component does not maintain its own state. It receives the
-/*  comment object in its props from the previous component - the conventional
-/*  way, and uses that to populate the comment.
+/* This component does not maintain its own state. It receives the
+/* comment object in its props from the previous component - the conventional
+/* way, and uses that to populate the comment.
 /*
-/*  When an update has been made by user to the comment, this component
-/*  updates the comment in the server first, and then updates the comment
-/*  in the Redux Store. */
+/* When an update has been made by user to the comment, this component
+/* updates the comment in the server first, and then updates the comment
+/* in the Redux Store. 
+/*
+/* Ozgun Ulusoy, March 2018
+*/
 
 class SingleCommentView extends Component {
 

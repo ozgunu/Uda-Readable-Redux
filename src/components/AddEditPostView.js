@@ -4,10 +4,16 @@ import { addPost, updatePost } from '../actions/actions';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-// We only store the current post in the local state of this component.
-// All other categories and posts are accessed from Redux Store via props.
-// When we create / update a post, we update server first, then update
-// the post within the Redux Store.
+/* Redux Store passes the Post object (when editing a post), and
+/* categories array (always) into this component's props.
+/*
+/* We only store the current post in the local state of this component.
+/* So we can update instantly it when user types in the input fields.
+/* When user creates / updates a post, we update the server first, then
+/* the post within the Redux Store.
+/*
+/* Ozgun Ulusoy, March 2018
+*/
 
 class AddEditPostView extends Component {
 
@@ -19,21 +25,25 @@ class AddEditPostView extends Component {
     }
 
     componentDidMount() {
+       this.initialize(this.props);
+    }
 
-        // Look at the url params, do we have a postId passed?
-        let postId = (this.props.params) ? this.props.params.postId : null;
+    componentWillReceiveProps(nextProps) {
+        this.initialize(nextProps);
+    }
+    
+    initialize(props) {
 
-        // We are editing an existing post, find it in Redux Store, save it to local state
-        if (postId) {
-            var post = this.props.posts.find(post => post.id === postId);
+        // We are editing an existing post
+        if (props.post) {
             this.setState({
-                post: post ? post : {}
+                post: props.post
             });
         
         // We are adding a new post, just set its default category
         } else {
             this.setState({
-                post: { category: 'react' },
+                post: { category: props.categories[0] ? props.categories[0].name : 'Undefined Category' },
             });
         }
 
@@ -111,7 +121,7 @@ class AddEditPostView extends Component {
                         <input name='author' type='text' placeholder='Author' value={post.author ? post.author : ''} onChange={this.handleKeyPress} {...statusAttribue} />
                         <div className='clear-both'></div>
                         <label>Category: </label>
-                        <select id='categorySelect' defaultValue='react' {...statusAttribue} onChange={this.handleCategoryChange}>
+                        <select id='categorySelect' defaultValue='react' value={post.category} {...statusAttribue} onChange={this.handleCategoryChange}>
                             {
                                 categories.map(category => (
                                     <option key={category.name} value={category.name}>{category.name}</option>
@@ -129,11 +139,24 @@ class AddEditPostView extends Component {
 
 }
 
-function mapStateToProps ({myPostStore, myCategoryStore}) {
-    return {
-        posts: myPostStore.posts,
-        categories: myCategoryStore.categories
-    };
+function mapStateToProps ({myPostStore, myCategoryStore}, selfProps) {
+
+    // Read the postId from component's self props
+    const postId = selfProps.params.postId ? selfProps.params.postId : null;
+    
+    if (postId) {
+        let post = myPostStore.posts.find(post => post.id === postId);
+        return {
+            post,
+            categories: myCategoryStore.categories
+        };
+
+    } else  {  
+        return {
+            categories: myCategoryStore.categories
+        };
+    }
+
 }
 
 function mapDispatchToProps (dispatch) {

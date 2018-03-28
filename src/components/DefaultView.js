@@ -5,6 +5,22 @@ import SinglePostView from './SinglePostView';
 import { connect } from 'react-redux';
 import { updatePost, addCategories, addPosts } from '../actions/actions'
 
+/* This component is the Default (List) View of the app. It receives posts and categories
+/* into its props directly from the Redux Store. Then, stores the posts in its local state.
+
+/* I decided to do it this way because I did not want to re-order posts inside the Redux Store
+/* everytime user selects a different sort by option. So, we order them here in the local state
+/* and display these. When user makes a change to a post (voteScore), we update the post in the
+/* main Redux Store, not in the local state. This results in the props being sent to the
+/* component by Redux Store once again. So using componentWillReceiveProps we take props, sort
+/* them and store in the local state again.
+/*
+/* Basically local state is being used instead of a instance variable here. Could we do that?
+/* Which one is a preferred way of doing this?
+/*
+/* Ozgun Ulusoy, March 2018
+*/
+
 class DefaultView extends Component {
 
     // Constructor
@@ -22,6 +38,7 @@ class DefaultView extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        
         if (nextProps.posts && nextProps.posts.length > 0) {
             this.initialize(nextProps.posts);
         }
@@ -29,8 +46,7 @@ class DefaultView extends Component {
 
     /*  1) Find the Sort By select in dom read its default value
      *  2) Sort the posts based on this default value
-     *  3) Store these sorted posts in the local state
-     */
+     *  3) Store these sorted posts in the local state */
     initialize(posts) {
         let select = document.getElementById('sortSelect');
         let selectedOption = select.options[select.selectedIndex].value;

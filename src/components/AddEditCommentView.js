@@ -8,7 +8,10 @@ import React, { Component } from 'react';
 /* When a comment is submitted by the submit button, the function passed by the parent
 /* component is called, and the local state is passed to that function (as a comment object).
 /* Depending on which parent created this component, this function either creates a new
-/* comment or edits the existing one in the server. */
+/* comment or edits the existing one in the server. 
+/*
+/* Ozgun Ulusoy, March 2018
+*/
 
 class AddEditCommentView extends Component {
 

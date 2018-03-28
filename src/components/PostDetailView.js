@@ -7,14 +7,20 @@ import AddEditCommentView from './AddEditCommentView';
 import { updatePost, removePost, addComments, addComment, removeComment } from '../actions/actions';
 import { connect } from 'react-redux';
 
-/* This component does not have its own state. It receives the necessary Post and Comments object in its props
-/* directly from the Redux Store. For comments, here is what we do:
+/* This component does not have its own state. It receives the necessary 
+/* Post and Comments object in its props directly from the Redux Store. 
+/* For comments, here is what we do:
 
-/* On initial app load, we don't fetch all comments for all posts (not feasible). Instead, when we need to 
-/* show a post's comments, we check our Redux Store. If we find comments for this postId, then we pass these
-/* directly to this component (mapStateToProps). If we don't find comments however, this component will make
-/* the API call, fetch comments from server and update the Redux Store. Which then will cause a re-render and
-/* this second time our component will receive these comments in its props because they now exist in the Redux Store. */
+/* On initial app load, we don't fetch all comments for all posts (not feasible). 
+/* Instead, when we need to show a post's comments, we check our Redux Store. 
+/* If we find comments for this postId, then we pass these directly to this component 
+/* (mapStateToProps). If we don't find comments however, this component will make
+/* the API call, fetch comments from server and update the Redux Store. Which then 
+/* will cause a re-render and this second time our component will receive these 
+/* comments in its props because they now exist in the Redux Store. 
+/*
+/* Ozgun Ulusoy, March 2018
+*/
 
 class PostDetailView extends Component {
         
@@ -135,13 +141,14 @@ class PostDetailView extends Component {
 // passed to its props by Redux. But we need to do some calculations firts.
 function mapStateToProps ({myPostStore, myCommentStore}, selfProps) {
     
-    // Read the postId from component's self props (this comes from url params)
-    const postId = selfProps.params.postId ? selfProps.params.postId : null;
+    // Read the postId (this comes from url params) from component's self props
+    const postId = selfProps.params.postId ? selfProps.params.postId : '';
 
     // Find the post in Redux Store using its ID
     let post = myPostStore.posts.find(post => post.id === postId);
     
-    // If we find comments for this postId in Redux Store, send them in props
+    // If we find comments for this postId 
+    // in Redux Store, send them in props
     if (myCommentStore[postId]) {
         return {
             post,
