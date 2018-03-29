@@ -10,7 +10,7 @@ import { ADD_POSTS,
          UPDATE_COMMENT } from '../actions/actions';
 
 // Reducer for controlling the 'Posts Store'
-function myPostStore (state = { posts:[] }, action) {
+function myPostStore (state = { posts: null }, action) {
 
     var { post, posts } = action;
     var postsFromState = [];
@@ -110,7 +110,7 @@ function myCommentStore (state = {}, action) {
 }
 
 // Reducer for controlling the 'Category Store'
-function myCategoryStore (state = { categories:[] }, action) {
+function myCategoryStore (state = { categories: null }, action) {
 
     switch (action.type) {
 

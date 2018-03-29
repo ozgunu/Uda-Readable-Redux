@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 // This is a stateless component
 const SinglePostView = (props) => {
 
-    const { post, isSummary, changeVote } = props;
+    const { post, isSummary, changeVote, deletePost } = props;
     const dateTime = (new Date(post.timestamp)).toLocaleString();
 
     return (
@@ -12,6 +12,8 @@ const SinglePostView = (props) => {
             <div className='post-summary'>                
                 <div className='float-right'><a onClick={() => {changeVote && changeVote('downVote', post.id)}}>Vote Down</a></div>
                 <div className='float-right' style={{'marginRight': '10px'}}><a onClick={() => {changeVote && changeVote('upVote', post.id)}}>Vote Up</a></div>
+                <div className='float-right' style={{'marginRight': '10px'}}><a onClick={() => {deletePost && deletePost(post.id)}}>Delete</a></div>
+                <Link className='float-right' style={{'marginRight': '10px'}} to={`/addEditPost/${post.id}`}>Edit</Link>
                 {
                     (isSummary)
                     ? <Link to={`/${post.category}/${post.id}`}><div className='post-title'>{post.title}</div></Link> 

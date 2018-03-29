@@ -43,7 +43,7 @@ class AddEditPostView extends Component {
         // We are adding a new post, just set its default category
         } else {
             this.setState({
-                post: { category: props.categories[0] ? props.categories[0].name : 'Undefined Category' },
+                post: { category: (props.categories && props.categories[0]) ? props.categories[0].name : 'Undefined Category' },
             });
         }
 
@@ -123,7 +123,7 @@ class AddEditPostView extends Component {
                         <label>Category: </label>
                         <select id='categorySelect' defaultValue='react' value={post.category} {...statusAttribue} onChange={this.handleCategoryChange}>
                             {
-                                categories.map(category => (
+                                categories && categories.map(category => (
                                     <option key={category.name} value={category.name}>{category.name}</option>
                                 ))
                             }
@@ -145,7 +145,7 @@ function mapStateToProps ({myPostStore, myCategoryStore}, selfProps) {
     const postId = selfProps.params.postId ? selfProps.params.postId : null;
     
     if (postId) {
-        let post = myPostStore.posts.find(post => post.id === postId);
+        let post = myPostStore.posts && myPostStore.posts.find(post => post.id === postId);
         return {
             post,
             categories: myCategoryStore.categories
